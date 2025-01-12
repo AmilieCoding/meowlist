@@ -4,7 +4,7 @@ mod storage;
 use clap::{Parser, Subcommand};
 use colored::*; 
 use task::Task;
-use storage::{load_tasks, save_tasks};
+use storage::{load_tasks, save_task, update_task, delete_task};
 
 #[derive(Parser)]
 #[command(
@@ -29,28 +29,26 @@ enum Commands {
     List,
     #[command(about = "meow mrrp mrowww :D")]
     Done {
-        id: usize,
+        id: i32,
     },
     #[command(about = "mrrow :c")]
     Delete {
-        id: usize,
+        id: i32,
     },
 }
 
 fn main() {
     let cli = Cli::parse();
-    let mut tasks = load_tasks();
+    let tasks = load_tasks();
 
     match &cli.command {
         Commands::Add { description } => {
-            let id = tasks.len() + 1;
-            let task = Task::new(id, description.clone());
-            tasks.push(task);
-            save_tasks(&tasks);
+            let task = Task::new(0, description.clone()); // ID is auto-generated
+            save_task(&task);
             println!("{}", "Task added!".green()); 
         }
         Commands::List => {
-            for task in &tasks {
+            for task in tasks {
                 let status = if task.completed { "[x]" } else { "[ ]" };
                 let color = if task.completed { "green" } else { "red" };
                 println!(
@@ -62,17 +60,18 @@ fn main() {
             }
         }
         Commands::Done { id } => {
-            if let Some(task) = tasks.iter_mut().find(|t| t.id == *id) {
+            let mut tasks = load_tasks();
+            if let Some(task) = tasks.into_iter().find(|t| t.id == *id as usize) {
+                let mut task = task;
                 task.completed = true;
-                save_tasks(&tasks);
+                update_task(&task);
                 println!("{}", "Task marked as done!".green());
             } else {
                 println!("{}", "Task not found.".red()); 
             }
         }
         Commands::Delete { id } => {
-            tasks.retain(|task| task.id != *id);
-            save_tasks(&tasks);
+            delete_task(*id);
             println!("{}", "Task deleted!".red()); 
         }
     }
