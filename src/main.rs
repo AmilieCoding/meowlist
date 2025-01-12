@@ -60,7 +60,7 @@ fn main() {
             }
         }
         Commands::Done { id } => {
-            let mut tasks = load_tasks();
+            let tasks = load_tasks();
             if let Some(task) = tasks.into_iter().find(|t| t.id == *id as usize) {
                 let mut task = task;
                 task.completed = true;
