@@ -1,12 +1,10 @@
 [package]
-name = "meowlist"
-version = "0.3.0"
+name = "meowlist_gtk"
+version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = {version = "4.5.26", features = ["derive"]}
-colored = "3.0.0"
-serde = { version = "1.0.217", features = ["derive"]}
-serde_json = "1.0.135"
-dirs-next = "2.0"
+dirs-next = "2.0.0"
+glib-macros = "0.20.7"
+gtk = { version = "0.9.5", package = "gtk4", features = ["v4_16"] }
 rusqlite = "0.32.1"
