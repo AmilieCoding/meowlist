@@ -2,4 +2,4 @@
 Todo list management made easy!<br>
 Simply install it with "cargo install" and be on your way by running "meowlist"!<br>
 ------------
-You may install this program on a system with RUST installed via `cargo install --path .` in your home directory, or on Apple macOS (Intel and Silicon), use the .pkg.
+You may install this program on a system with RUST installed via `cargo install --path .` in your home directory, or on Apple macOS (Silicon ONLY), use the .dmg.
