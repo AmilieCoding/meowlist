@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use dirs_next::data_local_dir;
 use crate::task::Task;
 
+// -> Database Creation, folders etc.
 fn get_database_path() -> PathBuf {
     let mut dir = data_local_dir().expect("Can't determine data directory :c");
 
@@ -16,6 +17,7 @@ fn get_database_path() -> PathBuf {
     dir
 }
 
+// -> Setting up connections to the database, ensure it exists.
 fn get_connection() -> Connection {
     let db_path = get_database_path();
     let conn = Connection::open(db_path).expect("Can't open database :c");
@@ -32,6 +34,7 @@ fn get_connection() -> Connection {
     conn
 }
 
+// -> Loads tasks from the database, may be empty.
 pub fn load_tasks() -> Vec<Task> {
     let conn = get_connection();
     let mut stmt = conn.prepare("SELECT id, description, completed FROM tasks").unwrap();
@@ -47,6 +50,7 @@ pub fn load_tasks() -> Vec<Task> {
     task_iter.filter_map(Result::ok).collect()
 }
 
+// -> Saves tasks to the database (Command "meowlist add [item]" invokes this function.)
 pub fn save_task(task: &Task) {
     let conn = get_connection();
 
@@ -70,6 +74,7 @@ pub fn save_task(task: &Task) {
     ).expect("Can't save task :c");
 }
 
+// -> Task editing, not yet implemented.
 pub fn update_task(task: &Task) {
     let conn = get_connection();
     conn.execute(
@@ -78,6 +83,7 @@ pub fn update_task(task: &Task) {
     ).expect("Can't update task :c");
 }
 
+// -> Removal of tasks from the database (Invoked by "meowlist delete [id]")
 pub fn delete_task(task_id: i32) {
     let conn = get_connection();
 

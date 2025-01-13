@@ -6,6 +6,7 @@ use colored::*;
 use task::Task;
 use storage::{load_tasks, save_task, update_task, delete_task};
 
+// -> Setting up commands, disabling default help flags.
 #[derive(Parser)]
 #[command(
     name = "meowlist",
@@ -19,6 +20,7 @@ struct Cli {
     command: Commands,
 }
 
+// -> Setting up all commands and their descriptors.
 #[derive(Subcommand)]
 enum Commands {
     #[command(about = "mrrp mrrow mreow :)")]
@@ -37,13 +39,14 @@ enum Commands {
     },
 }
 
+// -> Main function to allow for the actual task feedback.
 fn main() {
     let cli = Cli::parse();
     let tasks = load_tasks();
 
     match &cli.command {
         Commands::Add { description } => {
-            let task = Task::new(0, description.clone()); // ID is auto-generated
+            let task = Task::new(0, description.clone());
             save_task(&task);
             println!("{}", "Task added!".green()); 
         }

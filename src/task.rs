@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+// -> Setting up task databases.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Task {
     pub id: usize,
