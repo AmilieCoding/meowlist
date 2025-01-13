@@ -22,7 +22,7 @@ fn get_connection() -> Connection {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY,
             description TEXT NOT NULL,
             completed INTEGER NOT NULL
         )",
@@ -49,9 +49,26 @@ pub fn load_tasks() -> Vec<Task> {
 
 pub fn save_task(task: &Task) {
     let conn = get_connection();
+
+    // Find the smallest missing ID
+    let next_id: i32 = conn.query_row(
+        "SELECT COALESCE(MIN(id) + 1, 1)
+         FROM tasks
+         WHERE (MIN(id) + 1) NOT IN (SELECT id FROM tasks)",
+        [],
+        |row| row.get(0),
+    ).unwrap_or_else(|_| {
+        // Fallback to find the maximum ID and increment it if the above query fails
+        conn.query_row(
+            "SELECT COALESCE(MAX(id), 0) + 1 FROM tasks",
+            [],
+            |row| row.get(0),
+        ).unwrap_or(1)
+    });
+
     conn.execute(
-        "INSERT INTO tasks (description, completed) VALUES (?1, ?2)",
-        params![task.description, task.completed as i32],
+        "INSERT INTO tasks (id, description, completed) VALUES (?1, ?2, ?3)",
+        params![next_id, task.description, task.completed as i32],
     ).expect("Can't save task :c");
 }
 
@@ -65,6 +82,20 @@ pub fn update_task(task: &Task) {
 
 pub fn delete_task(task_id: i32) {
     let conn = get_connection();
+
     conn.execute("DELETE FROM tasks WHERE id = ?1", params![task_id])
         .expect("Can't delete task :c");
+
+    // Renumber IDs to fill the gap
+    let mut stmt = conn.prepare("SELECT id FROM tasks ORDER BY id").unwrap();
+    let task_ids: Vec<i32> = stmt.query_map([], |row| row.get(0)).unwrap()
+        .filter_map(Result::ok)
+        .collect();
+
+    for (new_id, old_id) in task_ids.iter().enumerate() {
+        conn.execute(
+            "UPDATE tasks SET id = ?1 WHERE id = ?2",
+            params![(new_id + 1) as i32, old_id],
+        ).expect("Can't renumber task IDs :c");
+    }
 }
