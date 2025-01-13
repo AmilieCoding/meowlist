@@ -25,6 +25,7 @@ fn get_connection() -> Connection {
             id INTEGER PRIMARY KEY,
             description TEXT NOT NULL,
             completed INTEGER NOT NULL
+        )",
         [],
     ).expect("Can't create tasks table :c");
 
@@ -64,8 +65,8 @@ pub fn save_task(task: &Task) {
     });
 
     conn.execute(
-        "INSERT INTO tasks (description, completed) VALUES (?1, ?2)",
-        params![task.description, task.completed as i32],
+        "INSERT INTO tasks (id, description, completed) VALUES (?1, ?2, ?3)",
+        params![next_id, task.description, task.completed as i32],
     ).expect("Can't save task :c");
 }
 
@@ -79,6 +80,7 @@ pub fn update_task(task: &Task) {
 
 pub fn delete_task(task_id: i32) {
     let conn = get_connection();
+
     conn.execute("DELETE FROM tasks WHERE id = ?1", params![task_id])
         .expect("Can't delete task :c");
 
