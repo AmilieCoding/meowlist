@@ -1,6 +1,6 @@
 # MeowList - GTK Todo List.
 ------------
-MeowList makes tassk management easy, simple and reproducable. With a simple GUI, and easy to migrate database you can produce task lists on all your devices, quickly, easily and effectively.<br>
+MeowList makes task management easy, simple and reproducable. With a simple GUI, and easy to migrate database you can produce task lists on all your devices, quickly, easily and effectively.<br>
 ------------
 ## Installing MeowList
 MeowList has multiple methods of installation, depending on what operating system you are on, you'll want to follow a specific method.<br>
